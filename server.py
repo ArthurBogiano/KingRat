@@ -14,6 +14,13 @@ def init():
 # adiciona threads de listen por porta
 def addListen(sock, port):
     global threads
+
+    if not port.isnumeric():
+        print(f'[-] Erro: A porta deve ser númerico')
+        return 0
+
+    port = int(port)
+
     try:
         id = random_id()
         tr = Thread(target=listen, args=(sock, port, id))
@@ -119,7 +126,12 @@ def interact(id):
 
     id = int(id)
 
-    sess = sessions[id]
+    try:
+        sess = sessions[id]
+    except IndexError:
+        print(f'[-] Erro: Sessão não existe')
+        return 0
+
     con = sess[0]
 
     try:
@@ -156,7 +168,8 @@ def help():
     str = 'listens : listens ativos\n' \
           'sessions : sessões ativas\n' \
           'kill : mata listens ou sessions\n' \
-          'i : inicia interação com uma session\n'
+          'i : inicia interação com uma session\n' \
+          'l : inicia listen em uma porta\n'
 
     print(str)
 
@@ -172,7 +185,7 @@ if __name__ == '__main__':
     sessions = []
 
     print('[+] Iniciando listen')
-    addListen(init(), 9090)
+    addListen(init(), '9090')
 
     while True:
         cmd = input('[?] Comando: ')
@@ -206,6 +219,13 @@ if __name__ == '__main__':
                 interact(args[1])
             else:
                 print('Command "i": i [session_id]')
+
+        if 'l ' in cmd:
+            args = cmd.split(' ')
+            if len(args) == 2:
+                addListen(init(), args[1])
+            else:
+                print('Command "l": l [port]')
 
         if cmd == 'help':
             help()
